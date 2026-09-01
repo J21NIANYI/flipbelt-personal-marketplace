@@ -1,0 +1,41 @@
+{
+  "name": "flipbelt-product-intelligence-personal",
+  "version": "1.0.0",
+  "description": "Eight evidence-governed FlipBelt product experts with an independent personal OAuth connection.",
+  "author": {
+    "name": "FlipBelt"
+  },
+  "homepage": "https://wiki.flipbeltchina.com/mcp-guide",
+  "repository": "https://github.com/J21NIANYI/flipbelt-personal-marketplace",
+  "license": "Proprietary",
+  "keywords": [
+    "flipbelt",
+    "product-knowledge",
+    "sizing",
+    "materials",
+    "running"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "FlipBelt Product Intelligence（个人）",
+    "shortDescription": "飞比特产品专家团与个人独立知识连接。",
+    "longDescription": "面向个人空间的八项受控专家能力。安装后由本人连接只读 FlipBelt Knowledge，所有产品和品牌事实均来自当前发布版本。",
+    "developerName": "FlipBelt",
+    "category": "Productivity",
+    "capabilities": [
+      "knowledge",
+      "product-advice",
+      "evidence-review"
+    ],
+    "websiteURL": "https://wiki.flipbeltchina.com/mcp-guide",
+    "defaultPrompt": [
+      "查找一个飞比特产品并说明适用场景。",
+      "比较两款产品的结构、容量和选择边界。",
+      "依据当前知识库检查一份产品内容。"
+    ],
+    "brandColor": "#B8F34A",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  }
+}
