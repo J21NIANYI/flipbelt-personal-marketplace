@@ -1,7 +1,7 @@
 {
   "name": "flipbelt-product-intelligence-personal",
-  "version": "1.1.1",
-  "description": "Eight evidence-governed FlipBelt product experts with an independent personal OAuth connection.",
+  "version": "1.2.0",
+  "description": "Eight evidence-governed FlipBelt product experts for use with a separately configured personal Knowledge MCP.",
   "author": {
     "name": "FlipBelt"
   },
@@ -16,11 +16,10 @@
     "running"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "FlipBelt Product Intelligence（个人）",
-    "shortDescription": "飞比特产品专家团与个人独立知识连接。",
-    "longDescription": "面向个人空间的八项受控专家能力。安装后由本人连接只读 FlipBelt Knowledge，所有产品和品牌事实均来自当前发布版本。",
+    "shortDescription": "飞比特产品专家团；知识 MCP 由个人单独添加。",
+    "longDescription": "面向个人空间的八项受控专家能力。本插件不内置 MCP；请在客户端中单独添加只读 FlipBelt Knowledge，并由本人完成 OAuth。所有产品和品牌事实均来自当前发布版本。",
     "developerName": "FlipBelt",
     "category": "Productivity",
     "capabilities": [

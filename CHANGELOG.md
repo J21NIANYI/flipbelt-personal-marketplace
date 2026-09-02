@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 - 2026-09-02
+
+- Separate expert capability installation from MCP registration for personal Codex users.
+- Remove the bundled `.mcp.json` and `mcpServers` manifest reference.
+- Make the Codex graphical MCP setup the primary path and keep CLI login as a troubleshooting fallback.
+- Preserve the eight governed Skills, public Marketplace identity, team Marketplace, and production MCP boundaries.
+
 ## 1.1.1 - 2026-09-02
 
 - Remove the explicit `oauth_resource` override from the personal Codex MCP configuration.
