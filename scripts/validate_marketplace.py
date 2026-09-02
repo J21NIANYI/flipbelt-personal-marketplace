@@ -155,7 +155,6 @@ def main() -> int:
             "flipbelt-kb": {
                 "type": "http",
                 "url": MCP_URL,
-                "oauth_resource": MCP_URL,
             }
         }
     }:

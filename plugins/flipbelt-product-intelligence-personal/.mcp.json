@@ -2,8 +2,7 @@
   "mcpServers": {
     "flipbelt-kb": {
       "type": "http",
-      "url": "https://wiki.flipbeltchina.com/mcp",
-      "oauth_resource": "https://wiki.flipbeltchina.com/mcp"
+      "url": "https://wiki.flipbeltchina.com/mcp"
     }
   }
 }
