@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "flipbelt-kb": {
-      "type": "http",
-      "url": "https://wiki.flipbeltchina.com/mcp"
-    }
-  }
-}

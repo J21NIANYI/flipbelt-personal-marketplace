@@ -10,7 +10,7 @@
   "synced_tree_sha256": "ef3bf7b55b8a25d29d91c5572cf964a98d0138a20b4bcb766096007e9c984dec",
   "allowed_differences": [
     "personal plugin name and distribution semantic version",
-    "root .mcp.json and no Workspace App reference",
+    "Skills-only personal distribution with no MCP or Workspace App reference",
     "Marketplace manifest and public installation documentation",
     "distribution validation and synthetic test adapters"
   ]

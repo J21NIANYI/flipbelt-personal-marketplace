@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate marketplace, plugin, MCP, and public boundary
+      - name: Validate Skills-only marketplace, plugin, and public boundary
         run: python scripts/validate_marketplace.py
       - name: Validate deterministic Review size-chart behavior
         shell: pwsh

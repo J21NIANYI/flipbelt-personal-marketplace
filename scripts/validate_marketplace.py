@@ -14,8 +14,6 @@ MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 MANIFEST = PLUGIN / ".codex-plugin" / "plugin.json"
 GROK_MARKETPLACE = ROOT / ".grok-plugin" / "marketplace.json"
 GROK_MANIFEST = PLUGIN / "plugin.json"
-MCP = PLUGIN / ".mcp.json"
-MCP_URL = "https://wiki.flipbeltchina.com/mcp"
 PROVENANCE = ROOT / "SOURCE-PROVENANCE.json"
 EXPECTED_SKILLS = {
     "flipbelt-brand-advisor",
@@ -77,7 +75,7 @@ def main() -> int:
             errors.append("marketplace plugin name mismatch")
         if entry.get("source") != {"source": "local", "path": f"./plugins/{PLUGIN_NAME}"}:
             errors.append("marketplace source must point to the personal plugin")
-        if entry.get("policy") != {"installation": "AVAILABLE", "authentication": "ON_INSTALL"}:
+        if entry.get("policy") != {"installation": "AVAILABLE", "authentication": "ON_USE"}:
             errors.append("marketplace policy mismatch")
         if entry.get("category") != "Productivity":
             errors.append("marketplace category mismatch")
@@ -109,8 +107,8 @@ def main() -> int:
         errors.append("plugin version must be strict semver")
     if manifest.get("skills") != "./skills/":
         errors.append("plugin skills path must be ./skills/")
-    if manifest.get("mcpServers") != "./.mcp.json":
-        errors.append("plugin must reference ./.mcp.json")
+    if "mcpServers" in manifest or (PLUGIN / ".mcp.json").exists():
+        errors.append("personal plugin must be Skills-only without bundled MCP configuration")
     if "apps" in manifest or (PLUGIN / ".app.json").exists():
         errors.append("personal plugin must not contain a Workspace App reference")
 
@@ -149,17 +147,6 @@ def main() -> int:
     if any(key in grok_manifest for key in ("skills", "mcpServers", "apps", "interface", "policy")):
         errors.append("Grok plugin manifest must rely on standard discovery without Codex-only fields")
 
-    mcp = load_json(MCP, errors)
-    if mcp != {
-        "mcpServers": {
-            "flipbelt-kb": {
-                "type": "http",
-                "url": MCP_URL,
-            }
-        }
-    }:
-        errors.append("personal MCP configuration does not match the unique root contract")
-
     skill_root = PLUGIN / "skills"
     skills = {path.name for path in skill_root.iterdir() if path.is_dir()} if skill_root.is_dir() else set()
     if skills != EXPECTED_SKILLS:
@@ -191,7 +178,7 @@ def main() -> int:
         errors.append(f"unexpected plugin directories: {sorted(plugin_dirs)}")
 
     for path in ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts or path.suffix.lower() == ".png":
+        if not path.is_file() or any(part in {".git", ".tmp"} for part in path.parts) or path.suffix.lower() == ".png":
             continue
         try:
             text = path.read_text(encoding="utf-8")
@@ -217,7 +204,7 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    print("PERSONAL MARKETPLACE VALIDATION PASSED: plugins=1 skills=8 mcp=1 workspace_apps=0")
+    print("PERSONAL MARKETPLACE VALIDATION PASSED: plugins=1 skills=8 mcp=0 workspace_apps=0")
     return 0
 
 
