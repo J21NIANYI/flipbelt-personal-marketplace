@@ -1,0 +1,16 @@
+{
+  "name": "flipbelt-product-intelligence-personal",
+  "version": "1.1.0",
+  "description": "Eight evidence-governed FlipBelt product experts with an independent personal OAuth connection.",
+  "author": {
+    "name": "FlipBelt"
+  },
+  "homepage": "https://wiki.flipbeltchina.com/mcp-guide",
+  "keywords": [
+    "flipbelt",
+    "product-knowledge",
+    "sizing",
+    "materials",
+    "running"
+  ]
+}

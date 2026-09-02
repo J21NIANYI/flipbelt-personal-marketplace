@@ -19,11 +19,38 @@
 
 正常情况下不需要安装 Codex CLI，也不需要手动添加第二个 MCP。
 
+## Grok Build 安装
+
+> 本节适用于 Grok Build 客户端或 CLI，不适用于 grok.com 网页端 Connector。
+
+1. 安装并登录 Grok Build。
+2. 在终端执行：
+
+   ```bash
+   grok plugin marketplace add J21NIANYI/flipbelt-personal-marketplace
+   grok plugin install flipbelt-product-intelligence-personal --trust
+   ```
+
+3. 启动 Grok Build，输入 `/mcps` 打开 MCP 面板。
+4. 找到 `flipbelt-kb`，按提示完成身份验证；钉钉组织选择“飞途行远”。
+5. 授权完成后新建会话，依次验证知识检索、页面读取和素材读取。
+
+如果插件或 MCP 没有出现，先执行：
+
+```bash
+grok plugin marketplace update
+grok inspect
+grok mcp doctor flipbelt-kb
+```
+
+Grok Build 与 Codex 共用同一个插件目录和根 MCP，但各自保存独立的安装状态与 OAuth 凭据，不共享登录令牌。
+
 ## 与团队仓的区别
 
 - 团队 Workspace 继续使用 `J21NIANYI/flipbelt-plugin-marketplace`，本仓不会替换或更新它。
 - 本仓不引用团队 Workspace App，而是用插件内置 `.mcp.json` 直连唯一正式地址 `https://wiki.flipbeltchina.com/mcp`。
 - 每位用户保存自己的 OAuth 凭据；插件不会共享账号、令牌或权限。
+- Codex 与 Grok Build 使用并列的市场清单，二者始终指向同一个个人插件目录，不复制第二套专家能力。
 
 ## 安全边界
 

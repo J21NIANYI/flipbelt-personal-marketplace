@@ -12,6 +12,8 @@ PLUGIN_NAME = "flipbelt-product-intelligence-personal"
 PLUGIN = ROOT / "plugins" / PLUGIN_NAME
 MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 MANIFEST = PLUGIN / ".codex-plugin" / "plugin.json"
+GROK_MARKETPLACE = ROOT / ".grok-plugin" / "marketplace.json"
+GROK_MANIFEST = PLUGIN / "plugin.json"
 MCP = PLUGIN / ".mcp.json"
 MCP_URL = "https://wiki.flipbeltchina.com/mcp"
 PROVENANCE = ROOT / "SOURCE-PROVENANCE.json"
@@ -61,6 +63,7 @@ def synced_tree_sha256(plugin: Path) -> tuple[int, str]:
 def main() -> int:
     errors: list[str] = []
     marketplace = load_json(MARKETPLACE, errors)
+    grok_marketplace = load_json(GROK_MARKETPLACE, errors)
     provenance = load_json(PROVENANCE, errors)
     if marketplace.get("name") != "flipbelt-personal":
         errors.append("marketplace name must be flipbelt-personal")
@@ -80,6 +83,7 @@ def main() -> int:
             errors.append("marketplace category mismatch")
 
     manifest = load_json(MANIFEST, errors)
+    grok_manifest = load_json(GROK_MANIFEST, errors)
     source_commit = provenance.get("canonical_commit")
     if provenance.get("role") != "downstream-public-distribution":
         errors.append("SOURCE-PROVENANCE.json: invalid distribution role")
@@ -109,6 +113,41 @@ def main() -> int:
         errors.append("plugin must reference ./.mcp.json")
     if "apps" in manifest or (PLUGIN / ".app.json").exists():
         errors.append("personal plugin must not contain a Workspace App reference")
+
+    if grok_marketplace.get("name") != "flipbelt-personal":
+        errors.append("Grok marketplace name must be flipbelt-personal")
+    if grok_marketplace.get("owner") != {"name": "FlipBelt"}:
+        errors.append("Grok marketplace owner mismatch")
+    grok_entries = grok_marketplace.get("plugins")
+    if not isinstance(grok_entries, list) or len(grok_entries) != 1:
+        errors.append("Grok marketplace must contain exactly one plugin")
+        grok_entries = []
+    if grok_entries:
+        grok_entry = grok_entries[0]
+        if grok_entry.get("name") != PLUGIN_NAME:
+            errors.append("Grok marketplace plugin name mismatch")
+        if grok_entry.get("source") != {
+            "type": "local",
+            "path": f"./plugins/{PLUGIN_NAME}",
+        }:
+            errors.append("Grok marketplace source must point to the personal plugin")
+        if grok_entry.get("category") != "productivity":
+            errors.append("Grok marketplace category mismatch")
+        if grok_entry.get("version") != version:
+            errors.append("Grok marketplace version must match the Codex manifest")
+        if grok_entry.get("homepage") != "https://wiki.flipbeltchina.com/mcp-guide":
+            errors.append("Grok marketplace homepage mismatch")
+        if grok_entry.get("domains") != ["wiki.flipbeltchina.com"]:
+            errors.append("Grok marketplace domains mismatch")
+
+    if grok_manifest.get("name") != PLUGIN_NAME:
+        errors.append("Grok plugin manifest name mismatch")
+    if grok_manifest.get("version") != version:
+        errors.append("Grok plugin manifest version must match the Codex manifest")
+    if grok_manifest.get("homepage") != "https://wiki.flipbeltchina.com/mcp-guide":
+        errors.append("Grok plugin manifest homepage mismatch")
+    if any(key in grok_manifest for key in ("skills", "mcpServers", "apps", "interface", "policy")):
+        errors.append("Grok plugin manifest must rely on standard discovery without Codex-only fields")
 
     mcp = load_json(MCP, errors)
     if mcp != {
