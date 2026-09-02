@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -13,6 +14,7 @@ MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 MANIFEST = PLUGIN / ".codex-plugin" / "plugin.json"
 MCP = PLUGIN / ".mcp.json"
 MCP_URL = "https://wiki.flipbeltchina.com/mcp"
+PROVENANCE = ROOT / "SOURCE-PROVENANCE.json"
 EXPECTED_SKILLS = {
     "flipbelt-brand-advisor",
     "flipbelt-chief-advisor",
@@ -43,9 +45,23 @@ def load_json(path: Path, errors: list[str]) -> dict:
     return value
 
 
+def synced_tree_sha256(plugin: Path) -> tuple[int, str]:
+    files = sorted(
+        (path for area in ("shared", "skills") for path in (plugin / area).rglob("*") if path.is_file()),
+        key=lambda path: path.relative_to(plugin).as_posix(),
+    )
+    digest = hashlib.sha256()
+    for path in files:
+        relative = path.relative_to(plugin).as_posix()
+        file_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        digest.update(f"{relative}\0{file_hash}\n".encode())
+    return len(files), digest.hexdigest()
+
+
 def main() -> int:
     errors: list[str] = []
     marketplace = load_json(MARKETPLACE, errors)
+    provenance = load_json(PROVENANCE, errors)
     if marketplace.get("name") != "flipbelt-personal":
         errors.append("marketplace name must be flipbelt-personal")
     entries = marketplace.get("plugins")
@@ -64,6 +80,24 @@ def main() -> int:
             errors.append("marketplace category mismatch")
 
     manifest = load_json(MANIFEST, errors)
+    source_commit = provenance.get("canonical_commit")
+    if provenance.get("role") != "downstream-public-distribution":
+        errors.append("SOURCE-PROVENANCE.json: invalid distribution role")
+    if provenance.get("canonical_repository") != "flipbelt-product-intelligence (local-only)":
+        errors.append("SOURCE-PROVENANCE.json: invalid canonical repository")
+    if not isinstance(source_commit, str) or not re.fullmatch(r"[0-9a-f]{40}", source_commit):
+        errors.append("SOURCE-PROVENANCE.json: canonical_commit must be a full Git SHA")
+    if provenance.get("canonical_version") != "0.2.1":
+        errors.append("SOURCE-PROVENANCE.json: unexpected canonical version")
+    if provenance.get("target_plugin") != PLUGIN_NAME:
+        errors.append("SOURCE-PROVENANCE.json: target plugin mismatch")
+    if provenance.get("synced_paths") != ["shared", "skills"]:
+        errors.append("SOURCE-PROVENANCE.json: synced paths mismatch")
+    file_count, tree_hash = synced_tree_sha256(PLUGIN)
+    if provenance.get("synced_file_count") != file_count:
+        errors.append("SOURCE-PROVENANCE.json: synced file count mismatch")
+    if provenance.get("synced_tree_sha256") != tree_hash:
+        errors.append("SOURCE-PROVENANCE.json: synced tree SHA-256 mismatch")
     if manifest.get("name") != PLUGIN_NAME:
         errors.append("plugin manifest name mismatch")
     version = manifest.get("version")
@@ -100,6 +134,19 @@ def main() -> int:
         text = skill_md.read_text(encoding="utf-8")
         if not re.search(rf"(?m)^name:\s*{re.escape(skill_name)}\s*$", text):
             errors.append(f"{skill_name}: frontmatter name mismatch")
+
+    review = PLUGIN / "skills" / "flipbelt-review-specialist"
+    for relative in [
+        "references/document-review-contract.md",
+        "scripts/compare_size_chart.ps1",
+        "evals/cases.json",
+    ]:
+        if not (review / relative).is_file():
+            errors.append(f"{PLUGIN_NAME}: missing review parity asset {relative}")
+    review_text = (review / "SKILL.md").read_text(encoding="utf-8") if (review / "SKILL.md").is_file() else ""
+    for marker in ["PASS", "FAIL", "MISSING", "NO-SOURCE", "search_flipbelt_kb", "get_flipbelt_page", "get_flipbelt_asset"]:
+        if marker not in review_text:
+            errors.append(f"{PLUGIN_NAME}: Review Specialist missing contract marker {marker}")
 
     plugin_dirs = {path.name for path in (ROOT / "plugins").iterdir() if path.is_dir()}
     if plugin_dirs != {PLUGIN_NAME}:

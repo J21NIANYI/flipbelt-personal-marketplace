@@ -33,4 +33,4 @@
 
 ## 来源基线
 
-八项专家 Skill 从团队 Marketplace 远端 `main@3a4a687527e776975233536129f6a395e129ff75` 精确提取。个人仓只改变插件身份和连接方式，不修改专家事实边界。
+Product Intelligence 的 `shared/` 与 `skills/` 从本地唯一真源 `flipbelt-product-intelligence@5eaf3f988d491e378cfe97ba5bad1a69ce80e09b` 单向同步，源版本为 `0.2.1`。本仓只改变个人插件名、分发 SemVer、根 `.mcp.json`、Marketplace 清单、公开说明和验证适配，不从团队公开仓复制专家行为；完整来源与同步树摘要见 `SOURCE-PROVENANCE.json`。
